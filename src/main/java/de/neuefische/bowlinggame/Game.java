@@ -5,52 +5,56 @@ import java.util.List;
 
 public class Game {
 
-    List<Frame> frames = new ArrayList<>();
-    int count;
-    private boolean spare;
+    private List<Frame> frames = new ArrayList<>();
+    private int count;
 
     void addRoll(int pin){
-        if (count % 2 == 0) {
-            Frame frame = new Frame();
-            frame.pinsRolled[count % 2] += pin;
-            int sum = 0;
-            for (int i = 0; i < frame.pinsRolled.length; i++) {
-                sum += frame.pinsRolled[i];
-            }
-            frame.score = sum;
+        Frame frame;
+        int index = count % 2;
+        if (index == 0 ) {
+            frame = new Frame(2);
             frames.add(frame);
-
-        }else{
-            frames.get(frames.size()).pinsRolled[count % 2] += pin;
-            int sum = 0;
-            for (int i = 0; i < frames.get(frames.size()).pinsRolled.length; i++) {
-                sum += frames.get(frames.size()).pinsRolled[i];
-            }
-            frames.get(frames.size()).score = sum;
+        }else if(frames.get(frames.size() - 1).getPinsRolled()[0] == 10){
+            frame = new Frame(2);
+            frames.add(frame);
+            count++;
+            index = 0;
+        }
+        else {
+            frame = frames.get(frames.size() - 1);
         }
 
+        frame.setPinsRolled(index, pin);
+        frame.makeScore(frame, index);
+
+        if(frames.size() > 1 ){
+            if(frames.get(frames.size() - 2).isStrike()){
+                frames.get(frames.size() - 2).makeScore(frame, index);
+            }else if (frames.get(frames.size() - 2).isSpare() && index == 0){
+                frames.get(frames.size() - 2).makeScore(frame, 0);
+            }
+        }
+        count++;
     }
 
-    List<Frame> Frames (){
-        return frames;
-    }
+
 
     int totalScore(){
         int sum = 0;
-        int count = 0;
         for(Frame frame : frames){
-            sum +=  frame.score;
-            if(frame.score == 10){
-                sum += frames.get(count + 1).score;
-
-            }
-            count++;
+            sum +=  frame.getScore();
         }
         return sum;
     };
 
-    boolean Over(){
-        return false;
+
+
+    List<Frame> frames(){
+        return frames;
+    }
+
+    private boolean isOver(){
+        return frames.size() == 10;
     };
 
 
