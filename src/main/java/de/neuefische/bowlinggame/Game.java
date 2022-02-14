@@ -24,24 +24,36 @@ public class Game {
             frame = frames.get(frames.size() - 1);
         }
 
-        setFrames(frame, index, pin);
+        updateFrames(frame, index, pin);
         count++;
     }
 
-    private void setFrames(Frame frame, int index, int pin){
-        frame.setPinsRolled(index, pin);
-        frame.makeScore(frame, index);
+    private void updateFrames(Frame frame, int index, int pin){
 
-        if(frames.size() > 1 ){
-            if(frames.get(frames.size() - 2).isStrike()){
-                frames.get(frames.size() - 2).makeScore(frame, index);
-            }else if (frames.get(frames.size() - 2).isSpare() && index == 0){
-                frames.get(frames.size() - 2).makeScore(frame, 0);
+        //First part creates an Array of length 3 when player reaches a spare in the very last round - the only time the player can throw three times
+        if(frames.get(frames.size() - 1).isSpare() && isOver()){
+            Frame lastFrame = new Frame(3);
+            System.arraycopy(frame.getPinsRolled(), 0, lastFrame.getPinsRolled(), 0, 2);
+            lastFrame.setPinsRolled(2 , pin);
+            for (int i = 0; i < 3; i++) {
+                lastFrame.makeScore(lastFrame, i);
+            }
+            frames.remove(frame);
+            frames.add(lastFrame);
+        }else {
+            frame.setPinsRolled(index, pin);
+            frame.makeScore(frame, index);
+
+            //
+            if (frames.size() > 1) {
+                if (frames.get(frames.size() - 2).isStrike()) {
+                    frames.get(frames.size() - 2).makeScore(frame, index);
+                } else if (frames.get(frames.size() - 2).isSpare() && index == 0) {
+                    frames.get(frames.size() - 2).makeScore(frame, 0);
+                }
             }
         }
     }
-
-
 
     public int totalScore(){
         int sum = 0;
@@ -52,7 +64,7 @@ public class Game {
     };
 
 
-    List<Frame> frames(){
+    public List<Frame> frames(){
         return frames;
     }
 
