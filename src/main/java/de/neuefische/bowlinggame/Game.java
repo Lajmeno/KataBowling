@@ -11,10 +11,10 @@ public class Game {
     void addRoll(int pin){
         Frame frame;
         int index = count % 2;
-        if (index == 0 ) {
+        if (index == 0 && !isOver() ) {
             frame = new Frame(2);
             frames.add(frame);
-        }else if(frames.get(frames.size() - 1).getPinsRolled()[0] == 10){
+        }else if(frames.get(frames.size() - 1).getPinsRolled()[0] == 10 && !isOver()){
             frame = new Frame(2);
             frames.add(frame);
             count++;
@@ -24,6 +24,11 @@ public class Game {
             frame = frames.get(frames.size() - 1);
         }
 
+        setFrames(frame, index, pin);
+        count++;
+    }
+
+    private void setFrames(Frame frame, int index, int pin){
         frame.setPinsRolled(index, pin);
         frame.makeScore(frame, index);
 
@@ -34,19 +39,17 @@ public class Game {
                 frames.get(frames.size() - 2).makeScore(frame, 0);
             }
         }
-        count++;
     }
 
 
 
-    int totalScore(){
+    public int totalScore(){
         int sum = 0;
         for(Frame frame : frames){
             sum +=  frame.getScore();
         }
         return sum;
     };
-
 
 
     List<Frame> frames(){
